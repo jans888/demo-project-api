@@ -1,11 +1,12 @@
 import config from '../config/base.config';
 import controller from '../controller/categories.controller';
-import { performanceTime, checkStatusCode } from '../utils/helper'
+import { performanceTime, requestLogs } from '../utils/helper'
 import { getCategoryId, login } from '../utils/helper';
 
 describe('Categories', () => {
   it('GET /categories', async () => {
     const res = await controller.getCategories();
+    console.log(requestLogs(res))
     expect(res.statusCode).toEqual(200);
     expect(res.body.length).toBeGreaterThan(1);
     expect(Object.keys(res.body[0])).toEqual(['_id', 'name'])
@@ -24,6 +25,7 @@ describe('Categories', () => {
       const res = await controller
         .postCategories(body)
         .set("Authorization", "Bearer " + token)
+      console.log(requestLogs(res))
       expect(res.statusCode).toEqual(200);
       expect(res.body.name).toEqual(body.name);
       expect(performanceTime() - startTime).toBeLessThan(config.responseTime)
@@ -44,7 +46,8 @@ describe('Categories', () => {
       const res = await controller
         .putCategories(body, categoryId)
         .set("Authorization", "Bearer " + token)
-        expect(res.statusCode).toEqual(200);
+      console.log(requestLogs(res))
+      expect(res.statusCode).toEqual(200);
       expect(res.body.name).toBe(body.name);
       expect(performanceTime() - startTime).toBeLessThan(config.responseTime)
     });
@@ -63,6 +66,7 @@ describe('Categories', () => {
         .deleteCategories(categoryId)
         .set('Authorization', 'Bearer ' + token);
 
+      console.log(requestLogs(res))
       expect(res.statusCode).toEqual(200);
       expect(performanceTime() - startTime).toBeLessThan(config.responseTime)
     });

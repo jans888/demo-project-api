@@ -1,5 +1,5 @@
 import config from '../config/base.config';
-import { performanceTime, checkStatusCode, requestLogs } from '../utils/helper'
+import { performanceTime, requestLogs } from '../utils/helper'
 import controller from '../controller/upload.controller'
 
 describe('Upload File', () => {
@@ -7,6 +7,7 @@ describe('Upload File', () => {
     it('POST /upload/single', async () => {
         const startTime = performanceTime()
         const res = await controller.postUploadSingle('data/test.jpg')
+        console.log(requestLogs(res))
         expect(res.statusCode).toEqual(200)
         expect(res.body.filename).toEqual('test.jpg')
         expect(performanceTime() - startTime).toBeLessThan(config.responseTime)

@@ -1,5 +1,5 @@
 import controller from '../controller/brand.controller'
-import { performanceTime, checkStatusCode } from '../utils/helper'
+import { performanceTime, requestLogs } from '../utils/helper'
 import config from '../config/base.config'
 
 describe('Brands', () => {
@@ -9,6 +9,7 @@ describe('Brands', () => {
         const startTime = performanceTime()
         it('GET /brands', async () => {
             const res = await controller.getBrands()
+            console.log(requestLogs(res))
             expect(res.statusCode).toEqual(200)
             expect(res.body.length).toBeGreaterThan(1)
             expect(performanceTime() - startTime).toBeLessThan(config.responseTime)
@@ -24,10 +25,12 @@ describe('Brands', () => {
         }
         beforeAll(async () => {
             postBrand = await controller.postBrands(data)
+            console.log(requestLogs(postBrand))
         })
 
         afterAll(async () => {
             postBrand = await controller.getBrandById(postBrand.body._id)
+            console.log(requestLogs(postBrand))
         })
         it('POST /brands', async () => {
             expect(postBrand.statusCode).toEqual(200)
@@ -42,6 +45,8 @@ describe('Brands', () => {
             }
             const res = await controller.postBrands(data)
 
+            console.log(requestLogs(res))
+
             expect(res.statusCode).toEqual(422)
             expect(res.body.error).toEqual('Name is required')
         })
@@ -51,6 +56,8 @@ describe('Brands', () => {
                 'description': 123
             }
             const res = await controller.postBrands(data)
+
+            console.log(requestLogs(res))
 
             expect(res.statusCode).toEqual(422)
             expect(res.body.error).toEqual('Brand description must be a string')
@@ -62,6 +69,8 @@ describe('Brands', () => {
             }
             const res = await controller.postBrands(data)
 
+            console.log(requestLogs(res))
+
             expect(res.statusCode).toEqual(422)
             expect(res.body.error).toEqual('Brand name is too short')
         })
@@ -71,6 +80,8 @@ describe('Brands', () => {
             }
             const res = await controller.postBrands(data)
 
+            console.log(requestLogs(res))
+
             expect(res.statusCode).toEqual(422)
             expect(res.body.error).toEqual('Brand name is too long')
             expect(performanceTime() - startTime).toBeLessThan(config.responseTime)
@@ -78,6 +89,7 @@ describe('Brands', () => {
         it('Business Logic - Duplicate brand entries not allowed', async () => {
 
             const res2 = await controller.postBrands(data)
+            console.log(requestLogs(res2))
             expect(res2.statusCode).toEqual(422)
             expect(res2.body.error).toEqual(data.name + ' already exists')
             expect(performanceTime() - startTime).toBeLessThan(config.responseTime)
@@ -93,19 +105,23 @@ describe('Brands', () => {
                 'description': 'Test Brand Decsription ' + Math.floor(Math.random() * 1000)
             }
             postBrand = await controller.postBrands(data)
+            console.log(requestLogs(postBrand))
         })
 
         afterAll(async () => {
             postBrand = await controller.getBrandById(postBrand.body._id)
+            console.log(requestLogs(postBrand))
         })
         it('GET /brands/:id', async () => {
             const res = await controller.getBrandById(postBrand.body._id)
+            console.log(requestLogs(res))
             expect(res.statusCode).toEqual(200)
             expect(res.body.name).toEqual(postBrand.body.name)
             expect(performanceTime() - startTime).toBeLessThan(config.responseTime)
         })
         it('Business Logic - GET /brands/:invalid_id should throw 404', async () => {
             const res = await controller.getBrandById('65aa976a5a2863bac6e00105')
+            console.log(requestLogs(res))
             expect(res.statusCode).toEqual(404)
             expect(res.body.error).toEqual('Brand not found.')
         })
